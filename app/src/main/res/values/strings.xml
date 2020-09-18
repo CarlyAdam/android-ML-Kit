@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">Starbucks</string>
-    <string name="congrats">Congrats is the Starbucks logo!</string>
-    <string name="error">Ups,is not the Starbucks logo!</string>
+    <string name="open_camera">Open Camera</string>
 </resources>

@@ -6,8 +6,12 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.carlyadam.starbucks.databinding.ActivityMainBinding
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 
 
@@ -21,8 +25,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.textViewMessage.visibility = View.INVISIBLE
-        binding.imageViewCheck.visibility = View.INVISIBLE
+        binding.progressBar.visibility = View.INVISIBLE
 
         binding.buttonCamera.setOnClickListener {
             openCamera()
@@ -36,19 +39,38 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val photo = data!!.extras!!.get("data") as (Bitmap)
-        checkPic(photo)
+        if (requestCode == 11) {
+            val photo = data!!.extras!!.get("data") as (Bitmap)
+            checkPic(photo)
+        }
     }
 
-    private fun checkPic(photo: Bitmap) {
+    private fun checkPic(bitmap: Bitmap) {
+        binding.progressBar.visibility = View.VISIBLE
+        val image = FirebaseVisionImage.fromBitmap(bitmap)
+        val options = FirebaseVisionLabelDetectorOptions.Builder()
+            .setConfidenceThreshold(0.8f)
+            .build()
+        val detector = FirebaseVision.getInstance().getVisionLabelDetector(options)
 
-        binding.imageViewCapture.setImageBitmap(photo)
+        //2
+        detector.detectInImage(image)
+            //3
+            .addOnSuccessListener {
+                binding.progressBar.visibility = View.INVISIBLE
 
-        binding.textViewMessage.visibility = View.VISIBLE
-        binding.textViewMessage.text = getString(R.string.congrats)
+                val value = it.map { it.label.toString() }
 
-        binding.imageViewCheck.visibility = View.VISIBLE
-        binding.imageViewCheck.setImageDrawable(getDrawable(R.drawable.ic_check))
+                Toast.makeText(this, value.toString(), Toast.LENGTH_SHORT).show()
 
+                binding.imageViewCapture.setImageBitmap(bitmap)
+
+
+            }//4
+            .addOnFailureListener {
+                binding.progressBar.visibility = View.INVISIBLE
+                Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
+
+            }
     }
 }

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "675031978840",
+    "firebase_url": "https://starbucks-2f930.firebaseio.com",
+    "project_id": "starbucks-2f930",
+    "storage_bucket": "starbucks-2f930.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675031978840:android:fd2eb14a0141a5af7f4b2d",
+        "android_client_info": {
+          "package_name": "com.carlyadam.starbucks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675031978840-g17reqg5an2uaievb0uelk8ldnd6jpeh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.carlyadam.starbucks",
+            "certificate_hash": "7714d7d5705296a844528ef56e2b956f6cf72b73"
+          }
+        },
+        {
+          "client_id": "675031978840-8s53gtamj8lb8g2qf5cajtm45ecmk88n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2p5ZkjVvARqTJFgvutPMJUYapDOrJn7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675031978840-8s53gtamj8lb8g2qf5cajtm45ecmk88n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
