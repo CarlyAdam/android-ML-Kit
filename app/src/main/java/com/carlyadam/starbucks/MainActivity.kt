@@ -1,17 +1,18 @@
 package com.carlyadam.starbucks
 
+//import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions
 import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.carlyadam.starbucks.databinding.ActivityMainBinding
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.label.ImageLabeling
+import com.google.mlkit.vision.label.automl.AutoMLImageLabelerLocalModel
+import com.google.mlkit.vision.label.automl.AutoMLImageLabelerOptions
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 
 
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.progressBar.visibility = View.INVISIBLE
+        binding.textViewResult.visibility = View.INVISIBLE
+        binding.imageViewCapture.visibility = View.INVISIBLE
 
         binding.buttonCamera.setOnClickListener {
             openCamera()
@@ -41,36 +44,44 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 11) {
             val photo = data!!.extras!!.get("data") as (Bitmap)
+            binding.imageViewCapture.setImageBitmap(photo)
+            binding.imageViewCapture.visibility = View.VISIBLE
+            binding.textViewResult.visibility = View.VISIBLE
             checkPic(photo)
         }
     }
 
     private fun checkPic(bitmap: Bitmap) {
+        binding.textViewResult.text =""
         binding.progressBar.visibility = View.VISIBLE
-        val image = FirebaseVisionImage.fromBitmap(bitmap)
-        val options = FirebaseVisionLabelDetectorOptions.Builder()
-            .setConfidenceThreshold(0.8f)
+        val localModel = AutoMLImageLabelerLocalModel.Builder()
+            .setAssetFilePath("manifest.json")
             .build()
-        val detector = FirebaseVision.getInstance().getVisionLabelDetector(options)
 
-        //2
-        detector.detectInImage(image)
-            //3
-            .addOnSuccessListener {
+        val autoMLImageLabelerOptions = AutoMLImageLabelerOptions.Builder(localModel)
+            .setConfidenceThreshold(0F)
+            .build()
+
+        val labeler = ImageLabeling.getClient(autoMLImageLabelerOptions)
+
+        val image = InputImage.fromBitmap(bitmap, 0)
+
+        labeler.process(image)
+            .addOnSuccessListener { labels ->
+
                 binding.progressBar.visibility = View.INVISIBLE
-
-                val value = it.map { it.label.toString() }
-
-                Toast.makeText(this, value.toString(), Toast.LENGTH_SHORT).show()
-
-                binding.imageViewCapture.setImageBitmap(bitmap)
-
-
-            }//4
-            .addOnFailureListener {
-                binding.progressBar.visibility = View.INVISIBLE
-                Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
-
+                labels.forEach {
+                    val text = it.text
+                    val confidence = it.confidence
+                    binding.textViewResult.text =
+                        " ${binding.textViewResult.text} $text $confidence \n"
+                }
             }
+            .addOnFailureListener { e ->
+                binding.progressBar.visibility = View.INVISIBLE
+                e.printStackTrace()
+            }
+
+
     }
 }
