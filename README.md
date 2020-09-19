@@ -1,4 +1,4 @@
-# Android Ml Kit Example
+# Android ML Kit Example
 
 ## Built with
 *  Kotlin
